@@ -8,5 +8,6 @@ y = data[-1].reshape((data.shape[1], 1))  # Makes y a vector with each new line 
 onesVector = np.ones((data.shape[1], 1))  # Creates an m dimensional vector of 1s
 X = np.concatenate((onesVector, data[:-1].T), axis=1)  # Creates matrix X, where each new line is a different training example, where x0 on each line is 1
 
-theta = inv((X.T.dot(X))).dot(X.T).dot(y)
+theta = inv((X.T.dot(X))).dot(X.T).dot(y) #Normal Equation
+
 print("Theta = ", theta)

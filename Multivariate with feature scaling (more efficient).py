@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.loadtxt("data/TwoFeatures.txt", delimiter=",", unpack=True)  # Output is 1D. Vectors are 2D m x 1 dimension so need to change to 2D using reshape
+data = np.loadtxt("machine-learning-ex1/ex1/ex1data1.txt", delimiter=",", unpack=True)  # Output is 1D. Vectors are 2D m x 1 dimension so need to change to 2D using reshape
 
 y = data[-1].reshape((data.shape[1], 1))  # Makes y a vector with each new line different training set
 
@@ -10,7 +10,7 @@ theta = np.ones((data.shape[0], 1))
 onesVector = np.ones((data.shape[1], 1))  # Creates an m dimensional vector of 1s
 X = np.concatenate((onesVector, data[:-1].T), axis=1)  # Creates matrix X, where each new line is a different training example, where x0 on each line is 1
 
-iterations = 100000
+iterations = 10000
 
 '''Function to calculate cost for current theta values'''
 
@@ -48,10 +48,11 @@ def gradient_descent(X,y, theta, learning_rate, iterations):
 
 
 def scale_features(X):
-    X_std = X[:, 1:].std(0, keepdims=True)  # find standard deviation of each feature
-    X_mean = X[:, 1:].mean(0, keepdims=True)  # find mean of each feature
-    X[:, 1:] = (X[:, 1:] - X_mean) / X_std  # Normalise x1, x2, ..., xn
-    return X, X_std, X_mean  # X is normalised except x0 (1)
+    x_scaled = X.copy()
+    X_std = x_scaled[:, 1:].std(0, keepdims=True)  # find standard deviation of each feature
+    X_mean = x_scaled[:, 1:].mean(0, keepdims=True)  # find mean of each feature
+    x_scaled[:, 1:] = (x_scaled[:, 1:] - X_mean) / X_std  # Normalise x1, x2, ..., xn
+    return x_scaled, X_std, X_mean  # X is normalised except x0 (1)
 
 
 '''Function to unscale theta values after normalising (scaling) X'''
@@ -64,16 +65,16 @@ def unscale_theta(theta, X_std, X_mean):
 
 
 X_scaled, X_std, X_mean = scale_features(X)
+cost_history, theta_history, theta = gradient_descent(X_scaled, y, theta, 0.1, iterations)
 
-cost_history, theta_history, theta = gradient_descent(X_scaled, y, theta, 0.0001, iterations)
+theta = unscale_theta(theta, X_std, X_mean)
 
-iterationsX = np.arange(1, iterations + 1, dtype= int)
-
-print("Theta is", unscale_theta(theta, X_std, X_mean), " (After unscaling)")
 
 # Plot graph of cost vs iterations
+iterationsX = np.arange(1, iterations + 1, dtype= int)
 plt.plot(iterationsX, cost_history, '-r')  # need x and y values separate or pyplot autogenerates x values.
 plt.xlabel('Iterations')
 plt.ylabel('Cost Function')
 plt.xlim((1, iterations))
 plt.show()
+
